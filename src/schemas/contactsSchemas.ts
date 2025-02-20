@@ -1,13 +1,14 @@
 import { z } from 'zod';
 
 export const contactSchema = z.object({
-    id: z.string(),
+    id: z.string().uuid(),
     name: z.string().nonempty(),
     email: z.string().email(),
     phone: z.string().nonempty(),
+    favorite: z.boolean().optional(),
 });
 
-export type Contact = z.infer<typeof contactSchema>;
+export type ContactAttributes = z.infer<typeof contactSchema>;
 
 export const createContactSchema = contactSchema.omit({ id: true });
 
@@ -18,3 +19,5 @@ export const updateContactSchema = contactSchema
         message: 'Body must have at least one field',
         path: [],
     });
+
+export const updateStatusContactSchema = contactSchema.pick({ favorite: true });
