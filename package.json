@@ -27,7 +27,7 @@
         "type-check": "tsc --noEmit",
         "format": "prettier --write ./src/**/*.ts",
         "lint": "eslint src/** --fix",
-        "prepare": "husky"
+        "prepare": "is-ci || husky"
     },
     "dependencies": {
         "@types/cors": "^2.8.17",
@@ -53,6 +53,7 @@
         "eslint-plugin-simple-import-sort": "^12.1.1",
         "eslint-plugin-unused-imports": "^4.1.4",
         "husky": "^9.1.7",
+        "is-ci": "^4.1.0",
         "lint-staged": "^15.4.3",
         "pkgroll": "^2.10.0",
         "prettier": "^3.5.1",
