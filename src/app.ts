@@ -1,12 +1,11 @@
 import cors from 'cors';
-import dotenv from 'dotenv';
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 
+import 'dotenv/config';
+
 import HttpError from './helpers/HttpError.js';
 import contactsRouter from './routes/contactsRouter.js';
-
-dotenv.config();
 
 const app = express();
 const port = process.env['PORT'] || 3000;
