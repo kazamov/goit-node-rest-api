@@ -1,35 +1,39 @@
 import { Contact } from '@/db/models/Contact.js';
 import { ContactAttributes, contactSchema } from '@/schemas/contactsSchemas.js';
 
-export async function listContacts(): Promise<ContactAttributes[]> {
-    const contacts = await Contact.findAll();
+type ContactQuery = Partial<ContactAttributes>;
+
+export async function listContacts(query: ContactQuery): Promise<ContactAttributes[]> {
+    const contacts = await Contact.findAll({
+        where: query,
+    });
     return contacts.map((contact) => contactSchema.parse(contact.toJSON()));
 }
 
-export async function getContactById(contactId: string): Promise<ContactAttributes | null> {
-    const contact = await Contact.findByPk(contactId);
+export async function getContact(query: ContactQuery): Promise<ContactAttributes | null> {
+    const contact = await Contact.findOne({ where: query });
     return contact ? contactSchema.parse(contact.toJSON()) : null;
 }
 
-export async function removeContact(contactId: string): Promise<string | null> {
-    const numberOfDeletedRows = await Contact.destroy({ where: { id: contactId } });
-    return numberOfDeletedRows > 0 ? contactId : null;
+export async function removeContact(
+    query: Pick<ContactAttributes, 'id' | 'owner'>,
+): Promise<number> {
+    const numberOfDeletedRows = await Contact.destroy({ where: query });
+    return numberOfDeletedRows;
 }
 
-export async function addContact({
-    name,
-    email,
-    phone,
-}: Omit<ContactAttributes, 'id' | 'favorite'>): Promise<ContactAttributes> {
-    const contact = await Contact.create({ name, email, phone, favorite: false });
+export async function addContact(
+    payload: Omit<ContactAttributes, 'id' | 'favorite'>,
+): Promise<ContactAttributes> {
+    const contact = await Contact.create({ ...payload, favorite: false });
     return contactSchema.parse(contact.toJSON());
 }
 
 export async function updateContact(
-    contactId: string,
-    { name, email, phone, favorite }: Partial<Omit<ContactAttributes, 'id'>>,
+    query: Pick<ContactAttributes, 'id' | 'owner'>,
+    { name, email, phone, favorite }: Partial<Omit<ContactAttributes, 'id' | 'owner'>>,
 ): Promise<ContactAttributes | null> {
-    const contact = await Contact.findByPk(contactId);
+    const contact = await Contact.findOne({ where: query });
 
     if (!contact) {
         return null;

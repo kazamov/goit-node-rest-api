@@ -6,14 +6,15 @@ export const contactSchema = z.object({
     email: z.string().email(),
     phone: z.string().nonempty(),
     favorite: z.boolean().optional(),
+    owner: z.string().uuid(),
 });
 
 export type ContactAttributes = z.infer<typeof contactSchema>;
 
-export const createContactSchema = contactSchema.omit({ id: true });
+export const createContactSchema = contactSchema.omit({ id: true, owner: true });
 
 export const updateContactSchema = contactSchema
-    .omit({ id: true })
+    .omit({ id: true, owner: true })
     .partial()
     .refine((data) => Object.keys(data).length > 0, {
         message: 'Body must have at least one field',
