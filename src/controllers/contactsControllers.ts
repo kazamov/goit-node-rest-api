@@ -2,12 +2,19 @@ import { Request, Response } from 'express';
 
 import HttpError from '@/helpers/HttpError.js';
 import { PublicUserAttributes } from '@/schemas/authSchemas.js';
+import { contactsQuerySchema } from '@/schemas/contactsSchemas.js';
 import * as contactsService from '@/services/contactsServices.js';
 
 export const getAllContacts = async (req: Request, res: Response) => {
-    const { id } = req.user as PublicUserAttributes;
+    const { id: owner } = req.user as PublicUserAttributes;
+    const { favorite, page, limit } = contactsQuerySchema.parse(req.query);
 
-    const contacts = await contactsService.listContacts({ owner: id });
+    const contacts = await contactsService.listContacts({
+        owner,
+        ...(typeof favorite === 'boolean' && { favorite }),
+        page,
+        limit,
+    });
 
     res.json(contacts);
 };

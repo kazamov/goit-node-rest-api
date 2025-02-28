@@ -3,9 +3,22 @@ import { ContactAttributes, contactSchema } from '@/schemas/contactsSchemas.js';
 
 type ContactQuery = Partial<ContactAttributes>;
 
-export async function listContacts(query: ContactQuery): Promise<ContactAttributes[]> {
+interface ListContactsOptions extends ContactQuery {
+    page?: number;
+    limit?: number;
+}
+
+export async function listContacts({
+    page,
+    limit,
+    ...query
+}: ListContactsOptions): Promise<ContactAttributes[]> {
+    const offset = page && limit ? (page - 1) * limit : undefined;
+
     const contacts = await Contact.findAll({
         where: query,
+        ...(limit && { limit }),
+        ...(offset && { offset }),
     });
     return contacts.map((contact) => contactSchema.parse(contact.toJSON()));
 }
