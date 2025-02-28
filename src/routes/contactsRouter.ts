@@ -4,12 +4,13 @@ import {
     createContact,
     deleteContact,
     getAllContacts,
-    getContactById,
+    getContact,
     updateContact,
     updateStatusContact,
 } from '@/controllers/contactsControllers.js';
 import { catchErrors } from '@/decorators/catchErrors.js';
 import { validateBody } from '@/decorators/validateBody.js';
+import { authenticate } from '@/middlewares/authenticate.js';
 import {
     createContactSchema,
     updateContactSchema,
@@ -18,9 +19,11 @@ import {
 
 const contactsRouter = express.Router();
 
+contactsRouter.use(authenticate);
+
 contactsRouter.get('/', catchErrors(getAllContacts));
 
-contactsRouter.get('/:id', catchErrors(getContactById));
+contactsRouter.get('/:id', catchErrors(getContact));
 
 contactsRouter.delete('/:id', catchErrors(deleteContact));
 

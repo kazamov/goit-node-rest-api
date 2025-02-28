@@ -8,44 +8,43 @@ import {
 
 import { sequelize } from '../sequelize.js';
 
-export class Contact extends Model<InferAttributes<Contact>, InferCreationAttributes<Contact>> {
+import { Subscription, subscriptionList, SubscriptionType } from '@/constants/auth.js';
+
+export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id?: CreationOptional<string>;
-    declare name: string;
+    declare password: string;
     declare email: string;
-    declare phone: string;
-    declare favorite: boolean;
-    declare owner: string;
+    declare subscription: SubscriptionType;
+    declare token: string | null;
 }
 
-Contact.init(
+User.init(
     {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
         },
-        name: {
+        password: {
             type: DataTypes.STRING,
             allowNull: false,
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
+            unique: true,
         },
-        phone: {
+        subscription: {
+            type: DataTypes.ENUM,
+            values: subscriptionList,
+            defaultValue: Subscription.STARTER,
+        },
+        token: {
             type: DataTypes.STRING,
-            allowNull: false,
-        },
-        favorite: {
-            type: DataTypes.BOOLEAN,
-            defaultValue: false,
-        },
-        owner: {
-            type: DataTypes.UUID,
-            allowNull: false,
+            defaultValue: null,
         },
     },
     { sequelize },
 );
 
-await Contact.sync();
+await User.sync();
