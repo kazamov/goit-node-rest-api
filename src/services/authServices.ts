@@ -11,6 +11,7 @@ import {
     SignInResponse,
     SignUpResponse,
     UserAttributes,
+    userSchema,
 } from '@/schemas/authSchemas.js';
 
 type UserQuery =
@@ -18,11 +19,11 @@ type UserQuery =
     | Pick<UserAttributes, 'id'>
     | Pick<UserAttributes, 'email' | 'id'>;
 
-export async function findUser(query: UserQuery): Promise<PublicUserAttributes | null> {
+export async function findUser(query: UserQuery): Promise<UserAttributes | null> {
     const user = await User.findOne({
         where: query,
     });
-    return user ? publicUserSchema.parse(user.toJSON()) : null;
+    return user ? userSchema.parse(user.toJSON()) : null;
 }
 
 export async function signUp(
@@ -71,7 +72,7 @@ export async function signIn(email: string, password: string): Promise<SignInRes
 
     await user.update({ token }, { returning: true });
 
-    return { token };
+    return { user: publicUserSchema.parse(user.toJSON()), token };
 }
 
 export async function signOut(id: string): Promise<void> {
@@ -80,6 +81,10 @@ export async function signOut(id: string): Promise<void> {
         throw new HttpError('Not authorized', 401);
     }
     await user.update({ token: null }, { returning: true });
+}
+
+export function getCurrentUser(user: UserAttributes): PublicUserAttributes {
+    return publicUserSchema.parse(user);
 }
 
 export async function updateSubscription(

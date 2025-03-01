@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { PublicUserAttributes } from '@/schemas/authSchemas.js';
+import { UserAttributes } from '@/schemas/authSchemas.js';
 import * as authService from '@/services/authServices.js';
 
 export async function signUp(req: Request, res: Response) {
@@ -20,7 +20,7 @@ export async function signIn(req: Request, res: Response) {
 }
 
 export async function signOut(req: Request, res: Response) {
-    const { id } = req.user as PublicUserAttributes;
+    const { id } = req.user as UserAttributes;
 
     await authService.signOut(id);
 
@@ -28,11 +28,11 @@ export async function signOut(req: Request, res: Response) {
 }
 
 export async function getCurrent(req: Request, res: Response) {
-    res.json(req.user);
+    res.json(authService.getCurrentUser(req.user as UserAttributes));
 }
 
 export async function updateSubscription(req: Request, res: Response) {
-    const { id } = req.user as PublicUserAttributes;
+    const { id } = req.user as UserAttributes;
     const { subscription } = req.body;
 
     const user = await authService.updateSubscription(id, subscription);
