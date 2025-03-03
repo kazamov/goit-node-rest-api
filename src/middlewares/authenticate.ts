@@ -28,6 +28,10 @@ export async function authenticate(req: Request, res: Response, next: NextFuncti
         return next(new HttpError('User not found', 401));
     }
 
+    if (user.token !== token) {
+        return next(new HttpError('Invalid token', 401));
+    }
+
     req.user = user;
 
     next();

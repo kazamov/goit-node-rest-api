@@ -18,7 +18,7 @@ export type SignUpResponse = { user: PublicUserAttributes; token: string };
 
 export const signInPayloadSchema = userSchema.pick({ email: true, password: true });
 
-export type SignInResponse = { token: string };
+export type SignInResponse = { user: PublicUserAttributes; token: string };
 
 export const jwtUserSchema = userSchema.pick({ email: true, id: true });
 
