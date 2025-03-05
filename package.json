@@ -26,6 +26,7 @@
         "dev": "tsx --watch ./src/app.ts",
         "type-check": "tsc --noEmit",
         "format": "prettier --write ./src/**/*.ts",
+        "format:check": "prettier --check ./src/**/*.ts",
         "lint": "eslint src/** --fix",
         "test": "vitest",
         "coverage": "vitest --coverage",
