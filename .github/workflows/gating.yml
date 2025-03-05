@@ -9,6 +9,10 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
+        # Either run on push events, or on pull_request events only if from a fork
+        if: >
+            github.event_name == 'push' || 
+            (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)
 
         steps:
             - name: Checkout code
