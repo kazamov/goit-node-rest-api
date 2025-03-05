@@ -5,11 +5,13 @@ import {
     signIn,
     signOut,
     signUp,
+    updateAvatar,
     updateSubscription,
 } from '@/controllers/authControllers.js';
 import { catchErrors } from '@/decorators/catchErrors.js';
 import { validateBody } from '@/decorators/validateBody.js';
 import { authenticate } from '@/middlewares/authenticate.js';
+import { upload } from '@/middlewares/upload.js';
 import {
     signInPayloadSchema,
     signUpPayloadSchema,
@@ -32,5 +34,7 @@ authRouter.patch(
     authenticate,
     catchErrors(updateSubscription),
 );
+
+authRouter.patch('/avatars', authenticate, upload.single('avatar'), catchErrors(updateAvatar));
 
 export default authRouter;
