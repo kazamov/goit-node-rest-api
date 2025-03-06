@@ -1,5 +1,9 @@
+import fs from 'fs/promises';
+import path from 'path';
+
 import { Request, Response } from 'express';
 
+import HttpError from '@/helpers/HttpError.js';
 import { UserAttributes } from '@/schemas/authSchemas.js';
 import * as authService from '@/services/authServices.js';
 
@@ -14,9 +18,9 @@ export async function signUp(req: Request, res: Response) {
 export async function signIn(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    const token = await authService.signIn(email, password);
+    const user = await authService.signIn(email, password);
 
-    res.json(token);
+    res.json(user);
 }
 
 export async function signOut(req: Request, res: Response) {
@@ -36,6 +40,30 @@ export async function updateSubscription(req: Request, res: Response) {
     const { subscription } = req.body;
 
     const user = await authService.updateSubscription(id, subscription);
+
+    res.json(user);
+}
+
+const avatarsDir = path.resolve('public', 'avatars');
+
+export async function updateAvatar(req: Request, res: Response) {
+    const { id } = req.user as UserAttributes;
+    if (!req.file) {
+        throw new HttpError('No file uploaded', 400);
+    }
+
+    const { path: tempPath, filename } = req.file;
+
+    try {
+        await fs.rename(tempPath, path.join(avatarsDir, filename));
+    } catch {
+        await fs.unlink(tempPath);
+        throw new HttpError('Failed to process file', 500);
+    }
+
+    const avatarURL = path.join('avatars', filename);
+
+    const user = await authService.updateAvatar(id, avatarURL);
 
     res.json(user);
 }

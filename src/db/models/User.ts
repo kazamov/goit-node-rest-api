@@ -16,6 +16,7 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
     declare email: string;
     declare subscription: SubscriptionType;
     declare token: string | null;
+    declare avatarURL: string | null;
 }
 
 User.init(
@@ -40,6 +41,10 @@ User.init(
             defaultValue: Subscription.STARTER,
         },
         token: {
+            type: DataTypes.STRING,
+            defaultValue: null,
+        },
+        avatarURL: {
             type: DataTypes.STRING,
             defaultValue: null,
         },

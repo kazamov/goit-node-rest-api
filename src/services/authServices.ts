@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import gravatar from 'gravatar';
 
 import { Subscription } from '@/constants/auth.js';
 import { User } from '@/db/models/User.js';
@@ -38,10 +39,12 @@ export async function signUp(
         throw new HttpError(`User with email '${email}' already exists`, 409);
     }
 
+    const avatarURL = gravatar.url(email, {}, true);
+
     const passwordHash = await bcrypt.hash(password, 10);
 
     let newUser = await User.create(
-        { email, password: passwordHash, subscription: Subscription.STARTER },
+        { email, password: passwordHash, avatarURL, subscription: Subscription.STARTER },
         { returning: true },
     );
 
@@ -98,6 +101,18 @@ export async function updateSubscription(
     }
 
     await user.update({ subscription }, { returning: true });
+
+    return publicUserSchema.parse(user.toJSON());
+}
+
+export async function updateAvatar(id: string, avatarURL: string): Promise<PublicUserAttributes> {
+    const user = await User.findByPk(id);
+
+    if (!user) {
+        throw new HttpError('Not authorized', 401);
+    }
+
+    await user.update({ avatarURL }, { returning: true });
 
     return publicUserSchema.parse(user.toJSON());
 }

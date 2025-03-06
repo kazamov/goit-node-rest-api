@@ -8,6 +8,7 @@ export const userSchema = z.object({
     email: z.string().email(),
     subscription: z.enum(subscriptionList as [Subscription, ...Subscription[]]),
     token: z.string().nullable(),
+    avatarURL: z.string().nullable(),
 });
 
 export type UserAttributes = z.infer<typeof userSchema>;
