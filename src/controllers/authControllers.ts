@@ -54,7 +54,13 @@ export async function updateAvatar(req: Request, res: Response) {
 
     const { path: tempPath, filename } = req.file;
 
-    await fs.rename(tempPath, path.join(avatarsDir, filename));
+    try {
+        await fs.rename(tempPath, path.join(avatarsDir, filename));
+    } catch {
+        await fs.unlink(tempPath);
+        throw new HttpError('Failed to process file', 500);
+    }
+
     const avatarURL = path.join('avatars', filename);
 
     const user = await authService.updateAvatar(id, avatarURL);
