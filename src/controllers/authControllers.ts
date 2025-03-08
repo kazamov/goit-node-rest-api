@@ -12,7 +12,7 @@ export async function signUp(req: Request, res: Response) {
 
     const user = await authService.signUp({ email, password });
 
-    res.json(user);
+    res.status(201).json(user);
 }
 
 export async function signIn(req: Request, res: Response) {

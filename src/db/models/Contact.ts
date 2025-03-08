@@ -47,5 +47,3 @@ Contact.init(
     },
     { sequelize },
 );
-
-await Contact.sync();

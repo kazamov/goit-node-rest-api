@@ -51,5 +51,3 @@ User.init(
     },
     { sequelize },
 );
-
-await User.sync();

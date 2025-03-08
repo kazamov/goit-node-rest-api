@@ -5,3 +5,9 @@ node_modules/
 dist
 tmp
 coverage
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
