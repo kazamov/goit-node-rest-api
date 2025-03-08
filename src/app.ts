@@ -1,15 +1,19 @@
+// eslint-disable-next-line simple-import-sort/imports
+import { config } from './config.js';
+
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
 import morgan from 'morgan';
 
-import 'dotenv/config';
-
 import HttpError from './helpers/HttpError.js';
 import authRouter from './routes/authRouter.js';
 import contactsRouter from './routes/contactsRouter.js';
+import { testDatabaseConnection } from './db/sequelize.js';
+
+await testDatabaseConnection();
 
 const app = express();
-const port = process.env['PORT'] || 3000;
+const port = config.port;
 
 app.use(morgan('tiny'));
 app.use(cors());
@@ -32,5 +36,5 @@ app.use((err: HttpError, _req: Request, res: Response, _next: NextFunction) => {
 });
 
 app.listen(port, () => {
-    console.log(`[server]: Server is running at http://localhost:${port}`);
+    console.log(`[server]: Server is running at http://localhost:${port} in ${config.env} mode`);
 });
