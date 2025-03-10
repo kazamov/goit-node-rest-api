@@ -24,7 +24,10 @@ export default defineConfig({
         baseURL: `http://localhost:${config.port}`,
 
         /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-        trace: 'on-first-retry',
+        trace: process.env.CI ? 'on' : 'on-first-retry',
+
+        // Add screenshot for CI debugging
+        screenshot: process.env.CI ? 'on' : 'only-on-failure',
     },
 
     /* Run your local dev server before starting the tests */
@@ -35,6 +38,7 @@ export default defineConfig({
         env: {
             NODE_ENV: 'test',
         },
+        timeout: 120 * 1000, // Allow more time for server to start in CI
     },
 
     // Global setup and teardown
