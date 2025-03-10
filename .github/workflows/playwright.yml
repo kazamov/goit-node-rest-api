@@ -44,7 +44,7 @@ jobs:
               run: npm ci
 
             - name: Start API server
-              run: NODE_ENV=test npm run dev & npx wait-on http://localhost:3000
+              run: NODE_ENV=test npm run dev & npx wait-on http://localhost:$PORT
 
             - name: Run Playwright tests
               run: npm run e2e
