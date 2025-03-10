@@ -1,5 +1,4 @@
 import bcrypt from 'bcrypt';
-import { InferAttributes } from 'sequelize';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { Subscription } from '@/constants/auth.js';
@@ -7,6 +6,7 @@ import { User } from '@/db/models/User.js';
 import HttpError from '@/helpers/HttpError.js';
 import { createToken } from '@/helpers/jwt.js';
 import { signIn } from '@/services/authServices.js';
+import { UserAttributes } from '@/types/user.js';
 
 vi.mock('bcrypt', () => ({
     default: {
@@ -24,10 +24,10 @@ vi.mock('@/db/models/User.js', () => ({
     },
 }));
 
-interface MockUserModel extends InferAttributes<User> {
-    toJSON: () => InferAttributes<User>;
+interface MockUserModel extends UserAttributes {
+    toJSON: () => UserAttributes;
     update: (
-        data: Partial<InferAttributes<User>>,
+        data: Partial<UserAttributes>,
         options: { returning: boolean },
     ) => Promise<MockUserModel>;
 }
@@ -62,7 +62,7 @@ describe('authServices.signIn', () => {
 
     it('should successfully sign in with valid credentials', async () => {
         // Arrange
-        vi.mocked(User.findOne).mockResolvedValue(mockUser as User);
+        vi.mocked(User.findOne).mockResolvedValue(mockUser as unknown as User);
         vi.mocked(bcrypt.compare).mockResolvedValue(true as never);
         vi.mocked(createToken).mockReturnValue('new-token');
 
@@ -100,7 +100,7 @@ describe('authServices.signIn', () => {
 
     it('should throw error when password is incorrect', async () => {
         // Arrange
-        vi.mocked(User.findOne).mockResolvedValue(mockUser as User);
+        vi.mocked(User.findOne).mockResolvedValue(mockUser as unknown as User);
         vi.mocked(bcrypt.compare).mockResolvedValue(false as never);
 
         // Act & Assert

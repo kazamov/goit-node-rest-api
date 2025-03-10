@@ -11,16 +11,17 @@ import {
     publicUserSchema,
     SignInResponse,
     SignUpResponse,
-    UserAttributes,
     userSchema,
+    UserSchemaAttributes,
 } from '@/schemas/authSchemas.js';
+import { UserAttributes } from '@/types/user.js';
 
 type UserQuery =
-    | Pick<UserAttributes, 'email'>
-    | Pick<UserAttributes, 'id'>
-    | Pick<UserAttributes, 'email' | 'id'>;
+    | Pick<UserSchemaAttributes, 'email'>
+    | Pick<UserSchemaAttributes, 'id'>
+    | Pick<UserSchemaAttributes, 'email' | 'id'>;
 
-export async function findUser(query: UserQuery): Promise<UserAttributes | null> {
+export async function findUser(query: UserQuery): Promise<UserSchemaAttributes | null> {
     const user = await User.findOne({
         where: query,
     });
@@ -28,7 +29,7 @@ export async function findUser(query: UserQuery): Promise<UserAttributes | null>
 }
 
 export async function signUp(
-    payload: Pick<UserAttributes, 'email' | 'password'>,
+    payload: Pick<UserSchemaAttributes, 'email' | 'password'>,
 ): Promise<SignUpResponse> {
     const { email, password } = payload;
     const user = await User.findOne({
@@ -65,7 +66,10 @@ export async function signIn(email: string, password: string): Promise<SignInRes
         throw new HttpError('Email or password is incorrect', 401);
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+    const passwordMatch = await bcrypt.compare(
+        password,
+        (user as unknown as UserAttributes).password,
+    );
     if (!passwordMatch) {
         throw new HttpError('Email or password is incorrect', 401);
     }
@@ -86,7 +90,7 @@ export async function signOut(id: string): Promise<void> {
     await user.update({ token: null }, { returning: true });
 }
 
-export function getCurrentUser(user: UserAttributes): PublicUserAttributes {
+export function getCurrentUser(user: UserSchemaAttributes): PublicUserAttributes {
     return publicUserSchema.parse(user);
 }
 

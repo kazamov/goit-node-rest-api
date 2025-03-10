@@ -1,23 +1,11 @@
-import {
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-} from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
 import { sequelize } from '../sequelize.js';
 
-import { Subscription, subscriptionList, SubscriptionType } from '@/constants/auth.js';
+import { Subscription, subscriptionList } from '@/constants/auth.js';
+import type { UserAttributes, UserCreationAttributes } from '@/types/user.js';
 
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-    id?: CreationOptional<string>;
-    password: string;
-    email: string;
-    subscription: SubscriptionType;
-    token: string | null;
-    avatarURL: string | null;
-}
+export class User extends Model<UserAttributes, UserCreationAttributes> {}
 
 User.init(
     {

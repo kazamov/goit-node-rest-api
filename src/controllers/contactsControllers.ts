@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 
 import HttpError from '@/helpers/HttpError.js';
-import { UserAttributes } from '@/schemas/authSchemas.js';
+import { UserSchemaAttributes } from '@/schemas/authSchemas.js';
 import { contactsQuerySchema } from '@/schemas/contactsSchemas.js';
 import * as contactsService from '@/services/contactsServices.js';
 
 export const getAllContacts = async (req: Request, res: Response) => {
-    const { id: owner } = req.user as UserAttributes;
+    const { id: owner } = req.user as UserSchemaAttributes;
     const { favorite, page, limit } = contactsQuerySchema.parse(req.query);
 
     const contacts = await contactsService.listContacts({
@@ -21,7 +21,7 @@ export const getAllContacts = async (req: Request, res: Response) => {
 
 export const getContact = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { id: owner } = req.user as UserAttributes;
+    const { id: owner } = req.user as UserSchemaAttributes;
 
     const contact = await contactsService.getContact({ id, owner });
 
@@ -34,7 +34,7 @@ export const getContact = async (req: Request, res: Response) => {
 
 export const deleteContact = async (req: Request, res: Response) => {
     const { id } = req.params;
-    const { id: owner } = req.user as UserAttributes;
+    const { id: owner } = req.user as UserSchemaAttributes;
 
     const contact = await contactsService.removeContact({ id, owner });
 
@@ -47,7 +47,7 @@ export const deleteContact = async (req: Request, res: Response) => {
 
 export const createContact = async (req: Request, res: Response) => {
     const { name, email, phone } = req.body;
-    const { id: owner } = req.user as UserAttributes;
+    const { id: owner } = req.user as UserSchemaAttributes;
 
     const newContact = await contactsService.addContact({ name, email, phone, owner });
 
@@ -57,7 +57,7 @@ export const createContact = async (req: Request, res: Response) => {
 export const updateContact = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { name, email, phone } = req.body;
-    const { id: owner } = req.user as UserAttributes;
+    const { id: owner } = req.user as UserSchemaAttributes;
 
     const updatedContact = await contactsService.updateContact(
         { id, owner },
@@ -74,7 +74,7 @@ export const updateContact = async (req: Request, res: Response) => {
 export const updateStatusContact = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { favorite } = req.body;
-    const { id: owner } = req.user as UserAttributes;
+    const { id: owner } = req.user as UserSchemaAttributes;
 
     const updatedContact = await contactsService.updateContact({ id, owner }, { favorite });
 

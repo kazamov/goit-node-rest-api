@@ -1,21 +1,10 @@
-import {
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-} from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
 import { sequelize } from '../sequelize.js';
 
-export class Contact extends Model<InferAttributes<Contact>, InferCreationAttributes<Contact>> {
-    id?: CreationOptional<string>;
-    name: string;
-    email: string;
-    phone: string;
-    favorite: boolean;
-    owner: string;
-}
+import { ContactAttributes, ContactCreationAttributes } from '@/types/contact.js';
+
+export class Contact extends Model<ContactAttributes, ContactCreationAttributes> {}
 
 Contact.init(
     {

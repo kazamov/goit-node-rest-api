@@ -4,7 +4,7 @@ import path from 'path';
 import { Request, Response } from 'express';
 
 import HttpError from '@/helpers/HttpError.js';
-import { UserAttributes } from '@/schemas/authSchemas.js';
+import { UserSchemaAttributes } from '@/schemas/authSchemas.js';
 import * as authService from '@/services/authServices.js';
 
 export async function signUp(req: Request, res: Response) {
@@ -24,7 +24,7 @@ export async function signIn(req: Request, res: Response) {
 }
 
 export async function signOut(req: Request, res: Response) {
-    const { id } = req.user as UserAttributes;
+    const { id } = req.user as UserSchemaAttributes;
 
     await authService.signOut(id);
 
@@ -32,11 +32,11 @@ export async function signOut(req: Request, res: Response) {
 }
 
 export async function getCurrent(req: Request, res: Response) {
-    res.json(authService.getCurrentUser(req.user as UserAttributes));
+    res.json(authService.getCurrentUser(req.user as UserSchemaAttributes));
 }
 
 export async function updateSubscription(req: Request, res: Response) {
-    const { id } = req.user as UserAttributes;
+    const { id } = req.user as UserSchemaAttributes;
     const { subscription } = req.body;
 
     const user = await authService.updateSubscription(id, subscription);
@@ -47,7 +47,7 @@ export async function updateSubscription(req: Request, res: Response) {
 const avatarsDir = path.resolve('public', 'avatars');
 
 export async function updateAvatar(req: Request, res: Response) {
-    const { id } = req.user as UserAttributes;
+    const { id } = req.user as UserSchemaAttributes;
     if (!req.file) {
         throw new HttpError('No file uploaded', 400);
     }

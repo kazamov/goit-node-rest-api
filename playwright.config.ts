@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+import path from 'node:path';
 
 import { getConfig } from '@/config.js';
 
@@ -37,6 +38,6 @@ export default defineConfig({
     },
 
     // Global setup and teardown
-    globalSetup: './e2e/globalSetup.ts',
-    globalTeardown: './e2e/globalTeardown.ts',
+    globalSetup: path.resolve('./e2e/globalSetup.ts'),
+    globalTeardown: path.resolve('./e2e/globalTeardown.ts'),
 });

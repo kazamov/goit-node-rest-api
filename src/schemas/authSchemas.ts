@@ -11,7 +11,7 @@ export const userSchema = z.object({
     avatarURL: z.string().nullable(),
 });
 
-export type UserAttributes = z.infer<typeof userSchema>;
+export type UserSchemaAttributes = z.infer<typeof userSchema>;
 
 export const signUpPayloadSchema = userSchema.pick({ email: true, password: true });
 
