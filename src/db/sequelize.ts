@@ -1,21 +1,40 @@
 import { Sequelize } from 'sequelize';
 
-export const sequelize = new Sequelize({
+import { getConfig } from '../config.js';
+
+// Get database config from the centralized config
+const config = getConfig();
+
+const {
+    name: dbName,
+    username: dbUser,
+    password: dbPassword,
+    host: dbHost,
+    port: dbPort,
+    schema: dbSchema,
+    ssl: dbSsl,
+} = config.db;
+
+export const sequelize = new Sequelize(dbName, dbUser, dbPassword, {
+    host: dbHost,
+    port: dbPort,
     dialect: 'postgres',
-    username: process.env.DB_USERNAME,
-    password: process.env.DB_PASSWORD,
-    host: process.env.DB_HOST,
-    database: process.env.DB_NAME,
-    port: Number(process.env.DB_PORT),
+    logging: config.isDevelopment ? console.log : false,
+    schema: dbSchema,
     dialectOptions: {
-        ssl: true,
+        ssl: dbSsl,
+    },
+    define: {
+        // Set the schema for all models
+        schema: dbSchema,
     },
 });
 
-try {
-    await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
-} catch (e) {
-    console.log('Cannot connect to DB service: ', e);
-    process.exit(1);
+export async function testDatabaseConnection() {
+    try {
+        await sequelize.authenticate();
+        console.log('Database connection has been established successfully');
+    } catch {
+        console.error('Unable to connect to the database');
+    }
 }

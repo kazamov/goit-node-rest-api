@@ -1,23 +1,11 @@
-import {
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-} from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
 import { sequelize } from '../sequelize.js';
 
-import { Subscription, subscriptionList, SubscriptionType } from '@/constants/auth.js';
+import { Subscription, subscriptionList } from '@/constants/auth.js';
+import type { UserAttributes, UserCreationAttributes } from '@/types/user.js';
 
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-    declare id?: CreationOptional<string>;
-    declare password: string;
-    declare email: string;
-    declare subscription: SubscriptionType;
-    declare token: string | null;
-    declare avatarURL: string | null;
-}
+export class User extends Model<UserAttributes, UserCreationAttributes> {}
 
 User.init(
     {
@@ -51,5 +39,3 @@ User.init(
     },
     { sequelize },
 );
-
-await User.sync();

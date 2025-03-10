@@ -9,7 +9,7 @@ export const contactSchema = z.object({
     owner: z.string().uuid(),
 });
 
-export type ContactAttributes = z.infer<typeof contactSchema>;
+export type ContactSchemaAttributes = z.infer<typeof contactSchema>;
 
 export const createContactSchema = contactSchema.omit({ id: true, owner: true });
 

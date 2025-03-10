@@ -5,6 +5,7 @@
         "isolatedModules": true,
         "allowSyntheticDefaultImports": true,
         "resolveJsonModule": true,
+        "strictPropertyInitialization": false,
 
         "baseUrl": "./",
         "paths": {

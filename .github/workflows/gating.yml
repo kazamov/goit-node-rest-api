@@ -1,4 +1,4 @@
-name: Gating Pipeline
+name: Gating Checks
 
 on:
     push:
@@ -9,17 +9,34 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
+        environment: testing
+
         # Either run on push events, or on pull_request events only if from a fork
         if: >
             github.event_name == 'push' || 
             (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository)
 
+        services:
+            postgres:
+                image: postgres:16-alpine
+                env:
+                    POSTGRES_USER: ${{ secrets.DB_USERNAME }}
+                    POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                    POSTGRES_DB: ${{ secrets.DB_NAME }}
+                ports:
+                    - 5432:5432
+                options: >-
+                    --health-cmd "pg_isready -U $DB_USERNAME -d $DB_NAME"
+                    --health-interval 10s
+                    --health-timeout 5s
+                    --health-retries 5
+
         steps:
             - name: Checkout code
-              uses: actions/checkout@v3
+              uses: actions/checkout@v4
 
             - name: Setup Node.js
-              uses: actions/setup-node@v3
+              uses: actions/setup-node@v4
               with:
                   node-version: '22.14.0'
                   cache: 'npm'
@@ -41,3 +58,6 @@ jobs:
 
             - name: Test
               run: npm run test
+
+            - name: E2E Tests
+              run: npm run e2e

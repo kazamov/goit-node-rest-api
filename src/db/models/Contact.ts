@@ -1,21 +1,10 @@
-import {
-    CreationOptional,
-    DataTypes,
-    InferAttributes,
-    InferCreationAttributes,
-    Model,
-} from 'sequelize';
+import { DataTypes, Model } from 'sequelize';
 
 import { sequelize } from '../sequelize.js';
 
-export class Contact extends Model<InferAttributes<Contact>, InferCreationAttributes<Contact>> {
-    declare id?: CreationOptional<string>;
-    declare name: string;
-    declare email: string;
-    declare phone: string;
-    declare favorite: boolean;
-    declare owner: string;
-}
+import { ContactAttributes, ContactCreationAttributes } from '@/types/contact.js';
+
+export class Contact extends Model<ContactAttributes, ContactCreationAttributes> {}
 
 Contact.init(
     {
@@ -47,5 +36,3 @@ Contact.init(
     },
     { sequelize },
 );
-
-await Contact.sync();
