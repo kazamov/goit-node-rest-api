@@ -32,8 +32,8 @@
         "coverage": "vitest --coverage",
         "e2e": "playwright test",
         "e2e:debug": "playwright test --debug",
-        "db:test:start": "docker-compose -f docker-compose.test.yml --env-file .env.test up -d",
-        "db:test:stop": "docker-compose -f docker-compose.test.yml --env-file .env.test down",
+        "db:test:start": "docker compose -f docker-compose.test.yml --env-file .env.test up -d",
+        "db:test:stop": "docker compose -f docker-compose.test.yml --env-file .env.test down",
         "prepare": "is-ci || husky"
     },
     "dependencies": {
