@@ -21,7 +21,7 @@
         "node": "22.14.0"
     },
     "scripts": {
-        "build": "pkgroll --clean-dist --sourcemap --minify --env.NODE_ENV=production",
+        "build": "pkgroll --clean-dist --sourcemap --minify",
         "start": "node ./dist/app.mjs",
         "dev": "tsx --watch ./src/app.ts",
         "type-check": "tsc --noEmit",
@@ -30,12 +30,10 @@
         "lint": "eslint src/** --fix",
         "test": "vitest",
         "coverage": "vitest --coverage",
-        "e2e": "NODE_ENV=test playwright test",
+        "e2e": "playwright test",
         "e2e:debug": "playwright test --debug",
         "db:test:start": "docker-compose -f docker-compose.test.yml --env-file .env.test up -d",
         "db:test:stop": "docker-compose -f docker-compose.test.yml --env-file .env.test down",
-        "db:test:reset": "npm run db:test:stop && npm run db:test:start && npm run e2e:setup",
-        "e2e:full": "npm run db:test:start && npm run e2e && npm run db:test:stop",
         "prepare": "is-ci || husky"
     },
     "dependencies": {

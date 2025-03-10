@@ -5,12 +5,12 @@ import { fileURLToPath } from 'url';
 import { isTest } from '@/config.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const rootDir = path.resolve(__dirname, '..', '..');
+const rootDir = path.resolve(__dirname, '..');
 
 async function globalTeardown() {
     // Clean up the test environment
     // Safety check - only run in test environment
-    if (!isTest) {
+    if (!isTest()) {
         throw new Error('This function can only be run in the test environment');
     }
 

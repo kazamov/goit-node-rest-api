@@ -9,12 +9,12 @@ import {
 import { sequelize } from '../sequelize.js';
 
 export class Contact extends Model<InferAttributes<Contact>, InferCreationAttributes<Contact>> {
-    declare id?: CreationOptional<string>;
-    declare name: string;
-    declare email: string;
-    declare phone: string;
-    declare favorite: boolean;
-    declare owner: string;
+    id?: CreationOptional<string>;
+    name: string;
+    email: string;
+    phone: string;
+    favorite: boolean;
+    owner: string;
 }
 
 Contact.init(

@@ -1,6 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 
+import { User } from '@/db/models/User.js';
+
 test.describe('SignUp endpoint', () => {
     test.describe('with valid data', () => {
         const USER_EMAIL = faker.internet.email();
@@ -33,6 +35,14 @@ test.describe('SignUp endpoint', () => {
             expect(jsonBody.user).toHaveProperty('avatarURL', expect.any(String));
             expect(jsonBody.user).not.toHaveProperty('token');
             expect(jsonBody.user).not.toHaveProperty('password');
+
+            const user = await User.findOne({
+                where: {
+                    email: USER_EMAIL,
+                },
+            });
+
+            expect(user).not.toBeNull();
         });
 
         test('cannot create an account with existing email', async ({ request }) => {
@@ -56,6 +66,14 @@ test.describe('SignUp endpoint', () => {
                 'message',
                 `User with email '${USER_EMAIL}' already exists`,
             );
+
+            const users = await User.findAll({
+                where: {
+                    email: USER_EMAIL,
+                },
+            });
+
+            expect(users).toHaveLength(1);
         });
     });
 

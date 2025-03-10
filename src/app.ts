@@ -1,5 +1,5 @@
 // eslint-disable-next-line simple-import-sort/imports
-import { config } from './config.js';
+import { getConfig } from './config.js';
 
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
@@ -10,7 +10,11 @@ import authRouter from './routes/authRouter.js';
 import contactsRouter from './routes/contactsRouter.js';
 import { testDatabaseConnection } from './db/sequelize.js';
 
-await testDatabaseConnection();
+const config = getConfig();
+
+if (!config.isTest) {
+    await testDatabaseConnection();
+}
 
 const app = express();
 const port = config.port;

@@ -11,12 +11,12 @@ import { sequelize } from '../sequelize.js';
 import { Subscription, subscriptionList, SubscriptionType } from '@/constants/auth.js';
 
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-    declare id?: CreationOptional<string>;
-    declare password: string;
-    declare email: string;
-    declare subscription: SubscriptionType;
-    declare token: string | null;
-    declare avatarURL: string | null;
+    id?: CreationOptional<string>;
+    password: string;
+    email: string;
+    subscription: SubscriptionType;
+    token: string | null;
+    avatarURL: string | null;
 }
 
 User.init(

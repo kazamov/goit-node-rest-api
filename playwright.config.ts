@@ -1,7 +1,8 @@
 import { defineConfig } from '@playwright/test';
 
-// Import config only after setting NODE_ENV
-import { config } from './src/config.js';
+import { getConfig } from '@/config.js';
+
+const config = getConfig('test');
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -30,6 +31,9 @@ export default defineConfig({
         command: 'npm run dev',
         url: `http://localhost:${config.port}`,
         reuseExistingServer: !process.env.CI,
+        env: {
+            NODE_ENV: 'test',
+        },
     },
 
     // Global setup and teardown
