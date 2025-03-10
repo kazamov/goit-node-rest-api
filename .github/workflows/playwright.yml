@@ -18,7 +18,7 @@ jobs:
                     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
                     DB_NAME: ${{ secrets.DB_NAME }}
                 ports:
-                    - ${{ secrets.DB_PORT }}:5432
+                    - 5432:5432
                 options: >-
                     --health-cmd "pg_isready -U ${{ secrets.DB_USERNAME }} -d ${{ secrets.DB_NAME }}"
                     --health-interval 10s
