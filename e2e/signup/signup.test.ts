@@ -8,6 +8,14 @@ test.describe('SignUp endpoint', () => {
         const USER_EMAIL = faker.internet.email();
         const USER_PASSWORD = faker.internet.password();
 
+        test.afterAll(async () => {
+            await User.destroy({
+                where: {
+                    email: USER_EMAIL,
+                },
+            });
+        });
+
         test.describe.configure({ mode: 'serial' });
 
         test('can create an account', async ({ request }) => {
@@ -27,12 +35,15 @@ test.describe('SignUp endpoint', () => {
 
             const jsonBody = await response.json();
 
-            expect(jsonBody).toHaveProperty('token', expect.any(String));
-            expect(jsonBody).toHaveProperty('user');
-            expect(jsonBody.user).toHaveProperty('id', expect.any(String));
-            expect(jsonBody.user).toHaveProperty('email', USER_EMAIL);
-            expect(jsonBody.user).toHaveProperty('subscription', 'starter');
-            expect(jsonBody.user).toHaveProperty('avatarURL', expect.any(String));
+            expect(jsonBody).toMatchObject({
+                token: expect.any(String),
+                user: {
+                    id: expect.any(String),
+                    email: USER_EMAIL,
+                    subscription: 'starter',
+                    avatarURL: expect.any(String),
+                },
+            });
             expect(jsonBody.user).not.toHaveProperty('token');
             expect(jsonBody.user).not.toHaveProperty('password');
 
@@ -118,9 +129,10 @@ test.describe('SignUp endpoint', () => {
 
                 const jsonBody = await response.json();
 
-                expect(jsonBody).toHaveProperty('message', 'Validation failed');
-                expect(jsonBody).toHaveProperty('errors');
-                expect(jsonBody.errors).toEqual(errors);
+                expect(jsonBody).toEqual({
+                    message: 'Validation failed',
+                    errors,
+                });
             });
         });
     });

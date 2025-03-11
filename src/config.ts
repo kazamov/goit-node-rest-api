@@ -42,7 +42,6 @@ function loadConfig(nodeEnv?: string): Config {
 
     // Determine which environment we're in
     const localNodeEnv = process.env.NODE_ENV ?? nodeEnv ?? 'development';
-    console.log(`Running in ${localNodeEnv} environment`);
 
     // Load the appropriate .env file based on environment
     let envFile = '.env';
