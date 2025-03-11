@@ -9,7 +9,6 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
-        environment: testing
 
         # Either run on push events, or on pull_request events only if from a fork
         if: >
