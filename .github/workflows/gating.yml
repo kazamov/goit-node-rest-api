@@ -32,6 +32,11 @@ jobs:
                     --health-retries 5
 
         steps:
+            - name: Echo DB credentials
+              run: |
+                  echo "Database username: ${{ secrets.DB_USERNAME }}"
+                  echo "Database name: ${{ secrets.DB_NAME }}"
+
             - name: Checkout code
               uses: actions/checkout@v4
 
