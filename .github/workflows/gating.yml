@@ -10,16 +10,7 @@ jobs:
     build-and-test:
         runs-on: ubuntu-latest
         env:
-            # Set the environment variables for the database connection
-            DB_USERNAME: ${{ secrets.DB_USERNAME }}
-            DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-            DB_NAME: ${{ secrets.DB_NAME }}
-            DB_HOST: localhost
-            DB_PORT: 5432
-            DB_ENABLE_SSL: false
-            JWT_SECRET: ${{ secrets.JWT_SECRET }}
-            JWT_EXPIRES_IN: 1h
-            PORT: 3000
+            NODE_ENV: test
 
         # Either run on push events, or on pull_request events only if from a fork
         if: >
@@ -71,6 +62,17 @@ jobs:
 
             - name: E2E Tests
               run: npm run e2e
+              env:
+                  # Set the environment variables for the database connection
+                  DB_USERNAME: ${{ secrets.DB_USERNAME }}
+                  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+                  DB_NAME: ${{ secrets.DB_NAME }}
+                  DB_HOST: ${{ secrets.DB_HOST }}
+                  DB_PORT: ${{ secrets.DB_PORT }}
+                  DB_ENABLE_SSL: ${{ secrets.DB_ENABLE_SSL }}
+                  JWT_SECRET: ${{ secrets.JWT_SECRET }}
+                  JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+                  PORT: ${{ secrets.PORT }}
 
             - uses: actions/upload-artifact@v4
               if: ${{ !cancelled() }}
