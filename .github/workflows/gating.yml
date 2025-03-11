@@ -9,6 +9,7 @@ on:
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
+        environment: testing
 
         # Either run on push events, or on pull_request events only if from a fork
         if: >
@@ -31,10 +32,17 @@ jobs:
                     --health-retries 5
 
         steps:
-            - name: Echo DB credentials
+            - name: Create .env.test file
               run: |
-                  echo "Database username: ${{ secrets.DB_USERNAME }}"
-                  echo "Database name: ${{ secrets.DB_NAME }}"
+                  echo "PORT=${{ secrets.PORT }}" > .env.test
+                  echo "DB_USERNAME=${{ secrets.DB_USERNAME }}" > .env.test
+                  echo "DB_PASSWORD=${{ secrets.DB_PASSWORD }}" > .env.test
+                  echo "DB_NAME=${{ secrets.DB_NAME }}" > .env.test
+                  echo "DB_HOST=${{ secrets.DB_HOST }}" > .env.test
+                  echo "DB_PORT=${{ secrets.DB_PORT }}" > .env.test
+                  echo "DB_ENABLE_SSL=${{ secrets.DB_ENABLE_SSL }}" > .env.test
+                  echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" > .env.test
+                  echo "JWT_EXPIRES_IN=${{ secrets.JWT_EXPIRES_IN }}" > .env.test
 
             - name: Checkout code
               uses: actions/checkout@v4
