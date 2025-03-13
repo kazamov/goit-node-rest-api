@@ -19,12 +19,17 @@ jobs:
                     POSTGRES_PASSWORD: ${{ secrets.DB_PASSWORD }}
                     POSTGRES_DB: ${{ secrets.DB_NAME }}
                 ports:
-                    - 5432:5432
+                    - $DB_PORT:5432
                 options: >-
                     --health-cmd "pg_isready -U $DB_USERNAME -d $DB_NAME"
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
+            mailhog:
+                image: mailhog/mailhog
+                ports:
+                    - $SMTP_PORT:1025 # SMTP server
+                    - 8025:8025 # Web UI for debugging (optional)
 
         steps:
             - name: Checkout code
@@ -50,7 +55,7 @@ jobs:
             - name: Build
               run: npm run build
 
-            - name: Test
+            - name: Tests
               run: npm run test
 
             - name: E2E Tests
@@ -71,6 +76,7 @@ jobs:
                   SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
                   SMTP_HOST: ${{ secrets.SMTP_HOST }}
                   SMTP_PORT: ${{ secrets.SMTP_PORT }}
+                  SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
 
             - name: Upload test results
               if: always()

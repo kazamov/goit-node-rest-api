@@ -4,16 +4,13 @@ import { getConfig } from '@/config.js';
 
 const config = getConfig();
 const { smtp } = config;
-const { email, password, host, port } = smtp;
+const { email, password, host, port, secure } = smtp;
 
 const transporter = nodemailer.createTransport({
     host,
     port,
-    secure: true,
-    auth: {
-        user: email,
-        pass: password,
-    },
+    secure,
+    ...(email && password ? { auth: { user: email, pass: password } } : {}),
 });
 
 export async function sendEmail(

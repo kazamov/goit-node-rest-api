@@ -1,13 +1,16 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
+import mailhog from 'mailhog';
 
+import { getConfig } from '@/config.js';
 import { User } from '@/db/models/User.js';
-import { UserAttributes } from '@/types/user.js';
 
 test.describe('SignUp endpoint', () => {
     test.describe('with valid data', () => {
         const USER_EMAIL = faker.internet.email();
         const USER_PASSWORD = faker.internet.password();
+        const smtpServer = mailhog();
+        const config = getConfig();
 
         test.afterAll(async () => {
             await User.destroy({
@@ -15,6 +18,13 @@ test.describe('SignUp endpoint', () => {
                     email: USER_EMAIL,
                 },
             });
+        });
+
+        test.afterAll(async () => {
+            const message = await smtpServer.latestTo(USER_EMAIL);
+            if (message) {
+                await smtpServer.deleteMessage(message.ID);
+            }
         });
 
         test.describe.configure({ mode: 'serial' });
@@ -57,8 +67,17 @@ test.describe('SignUp endpoint', () => {
             });
 
             expect(user).not.toBeNull();
-            expect((user as unknown as UserAttributes).verificationToken).toEqual(
-                expect.any(String),
+            const verificationToken = user?.getDataValue('verificationToken');
+            expect(verificationToken).toEqual(expect.any(String));
+
+            const message = await smtpServer.latestTo(USER_EMAIL);
+
+            expect(message).not.toBeNull();
+            expect(message?.to).toEqual(USER_EMAIL);
+            expect(message?.from).toEqual(config.smtp.email);
+            expect(message?.subject).toEqual('Contacts API - Verification Email');
+            expect(message?.text).toContain(
+                `${config.apiDomain}/api/auth/verify/${verificationToken}`,
             );
         });
 

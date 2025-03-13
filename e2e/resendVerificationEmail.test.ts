@@ -1,8 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
+import mailhog from 'mailhog';
 
 import { createUser, deleteUser } from './utils.js';
 
+import { getConfig } from '@/config.js';
 import { Subscription } from '@/constants/auth.js';
 import { User } from '@/db/models/User.js';
 
@@ -126,6 +128,8 @@ test.describe('Resend verification email endpoint', () => {
         const USER_PASSWORD = faker.internet.password();
         const USER_SUBSCRIPTION = Subscription.STARTER;
         const USER_AVATAR_URL = faker.image.avatar();
+        const smtpServer = mailhog();
+        const config = getConfig();
 
         test.beforeAll(async () => {
             await createUser({
@@ -140,6 +144,11 @@ test.describe('Resend verification email endpoint', () => {
 
         test.afterAll(async () => {
             await deleteUser(USER_EMAIL);
+
+            const message = await smtpServer.latestTo(USER_EMAIL);
+            if (message) {
+                await smtpServer.deleteMessage(message.ID);
+            }
         });
 
         test('can resend verification email', async ({ request }) => {
@@ -172,6 +181,16 @@ test.describe('Resend verification email endpoint', () => {
                     verificationToken: expect.any(String),
                     verify: false,
                 }),
+            );
+
+            const message = await smtpServer.latestTo(USER_EMAIL);
+
+            expect(message).not.toBeNull();
+            expect(message?.to).toEqual(USER_EMAIL);
+            expect(message?.from).toEqual(config.smtp.email);
+            expect(message?.subject).toEqual('Contacts API - Verification Email');
+            expect(message?.text).toContain(
+                `${config.apiDomain}/api/auth/verify/${user?.getDataValue('verificationToken')}`,
             );
         });
     });

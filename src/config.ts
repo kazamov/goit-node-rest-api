@@ -37,6 +37,7 @@ interface Config {
         password: string;
         host: string;
         port: number;
+        secure: boolean;
     };
 }
 
@@ -96,6 +97,7 @@ function loadConfig(nodeEnv?: string): Config {
             password: process.env.SMTP_PASSWORD as string,
             host: process.env.SMTP_HOST as string,
             port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: process.env.SMTP_SECURE === 'true',
         },
     };
 
