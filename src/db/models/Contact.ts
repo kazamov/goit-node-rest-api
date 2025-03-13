@@ -36,3 +36,5 @@ Contact.init(
     },
     { sequelize },
 );
+
+// await Contact.sync({ force: true });

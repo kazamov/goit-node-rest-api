@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 
 import { User } from '@/db/models/User.js';
+import { UserAttributes } from '@/types/user.js';
 
 test.describe('SignUp endpoint', () => {
     test.describe('with valid data', () => {
@@ -36,15 +37,17 @@ test.describe('SignUp endpoint', () => {
             const jsonBody = await response.json();
 
             expect(jsonBody).toMatchObject({
-                token: expect.any(String),
+                token: null,
                 user: {
                     id: expect.any(String),
                     email: USER_EMAIL,
                     subscription: 'starter',
                     avatarURL: expect.any(String),
+                    verify: false,
                 },
             });
             expect(jsonBody.user).not.toHaveProperty('token');
+            expect(jsonBody.user).not.toHaveProperty('verificationToken');
             expect(jsonBody.user).not.toHaveProperty('password');
 
             const user = await User.findOne({
@@ -54,6 +57,9 @@ test.describe('SignUp endpoint', () => {
             });
 
             expect(user).not.toBeNull();
+            expect((user as unknown as UserAttributes).verificationToken).toEqual(
+                expect.any(String),
+            );
         });
 
         test('cannot create an account with existing email', async ({ request }) => {

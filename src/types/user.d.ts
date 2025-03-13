@@ -7,6 +7,8 @@ export interface UserAttributes {
     subscription: SubscriptionType;
     token: string | null;
     avatarURL: string | null;
+    verify: boolean;
+    verificationToken: string | null;
 }
 
 export type UserCreationAttributes = InferCreationAttributes<User>;
