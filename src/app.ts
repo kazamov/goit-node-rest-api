@@ -1,14 +1,13 @@
-// eslint-disable-next-line simple-import-sort/imports
-import { getConfig } from './config.js';
-
 import cors from 'cors';
 import express, { NextFunction, Request, Response } from 'express';
+import { rateLimit } from 'express-rate-limit';
 import morgan from 'morgan';
 
+import { testDatabaseConnection } from './db/sequelize.js';
 import HttpError from './helpers/HttpError.js';
 import authRouter from './routes/authRouter.js';
 import contactsRouter from './routes/contactsRouter.js';
-import { testDatabaseConnection } from './db/sequelize.js';
+import { getConfig } from './config.js';
 
 const config = getConfig();
 
@@ -19,8 +18,16 @@ if (!config.isTest) {
 const app = express();
 const port = config.port;
 
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    limit: 100,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+});
+
 app.use(morgan('tiny'));
 app.use(cors());
+app.use(limiter);
 app.use(express.json());
 app.use(express.static('public'));
 
