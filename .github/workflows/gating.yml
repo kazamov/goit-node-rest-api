@@ -1,4 +1,11 @@
 name: Gating Checks
+description: |
+    This workflow runs on pull requests to the main branch and performs various checks including type checking, linting, building, and running tests. It also sets up a PostgreSQL database and MailHog for email testing.
+    It uploads test results as artifacts for review.
+
+permissions:
+    contents: read
+    pull-requests: write
 
 on:
     pull_request:
