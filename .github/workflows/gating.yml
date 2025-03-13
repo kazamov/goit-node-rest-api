@@ -8,7 +8,6 @@ jobs:
     build-and-test:
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        environment: testing
         env:
             NODE_ENV: test
 
@@ -35,15 +34,6 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: '22.14.0'
-                  cache: 'npm'
-
-            - name: Cache node modules
-              uses: actions/cache@v4
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
 
             - name: Install dependencies
               run: npm ci
@@ -76,6 +66,11 @@ jobs:
                   JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
                   PORT: ${{ secrets.PORT }}
+                  API_DOMAIN: ${{ secrets.API_DOMAIN }}
+                  SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+                  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+                  SMTP_HOST: ${{ secrets.SMTP_HOST }}
+                  SMTP_PORT: ${{ secrets.SMTP_PORT }}
 
             - name: Upload test results
               if: always()
@@ -84,5 +79,4 @@ jobs:
                   name: test-results-${{ github.run_id }}
                   path: |
                       playwright-report/
-                      coverage/
                   retention-days: 14
