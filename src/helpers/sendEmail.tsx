@@ -1,6 +1,8 @@
+import { render } from '@react-email/render';
 import nodemailer from 'nodemailer';
 
 import { getConfig } from '@/config.js';
+import { EmailConfirmationTemplate } from '@/emails/ConfirmEmail.js';
 
 const config = getConfig();
 const { smtp } = config;
@@ -16,14 +18,14 @@ const transporter = nodemailer.createTransport({
 export async function sendEmail(
     to: string,
     subject: string,
-    text: string,
+    html: string,
 ): Promise<ReturnType<typeof transporter.sendMail> | null> {
     try {
         const info = await transporter.sendMail({
             from: email,
             to,
             subject,
-            text,
+            html,
         });
         console.log('Email sent:', info.messageId);
         return info;
@@ -31,4 +33,21 @@ export async function sendEmail(
         console.error('Error sending email:', error);
         return null;
     }
+}
+
+export async function sendVerificationEmail(
+    email: string,
+    verificationToken: string,
+): Promise<void> {
+    const config = getConfig();
+
+    const html = await render(
+        <EmailConfirmationTemplate
+            userName={email}
+            confirmationLink={`${config.apiDomain}/api/auth/verify/${verificationToken}`}
+            companyName="Contact Manager"
+        />,
+    );
+
+    await sendEmail(email, 'Contacts API - Verification Email', html);
 }

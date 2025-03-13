@@ -25,9 +25,11 @@ const limiter = rateLimit({
     legacyHeaders: false,
 });
 
+if (!config.isTest) {
+    app.use(limiter);
+}
 app.use(morgan('tiny'));
 app.use(cors());
-app.use(limiter);
 app.use(express.json());
 app.use(express.static('public'));
 

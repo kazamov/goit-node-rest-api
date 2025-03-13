@@ -2,12 +2,11 @@ import bcrypt from 'bcrypt';
 import gravatar from 'gravatar';
 import { v4 as uuidv4 } from 'uuid';
 
-import { getConfig } from '@/config.js';
 import { Subscription } from '@/constants/auth.js';
 import { User } from '@/db/models/User.js';
 import HttpError from '@/helpers/HttpError.js';
 import { createToken } from '@/helpers/jwt.js';
-import { sendEmail } from '@/helpers/sendEmail.js';
+import { sendVerificationEmail } from '@/helpers/sendEmail.js';
 import {
     jwtUserSchema,
     PublicUserAttributes,
@@ -29,19 +28,6 @@ export async function findUser(query: UserQuery): Promise<UserSchemaAttributes |
         where: query,
     });
     return user ? userSchema.parse(user.toJSON()) : null;
-}
-
-async function sendVerificationEmail(email: string, verificationToken: string): Promise<void> {
-    const config = getConfig();
-
-    await sendEmail(
-        email,
-        'Contacts API - Verification Email',
-        `
-        Please verify your email by clicking the link:
-        <a href="${config.apiDomain}/api/auth/verify/${verificationToken}">Verify Email</a>
-    `,
-    );
 }
 
 export async function signUp(

@@ -76,7 +76,7 @@ test.describe('SignUp endpoint', () => {
             expect(message?.to).toEqual(USER_EMAIL);
             expect(message?.from).toEqual(config.smtp.email);
             expect(message?.subject).toEqual('Contacts API - Verification Email');
-            expect(message?.text).toContain(
+            expect(message?.html).toContain(
                 `${config.apiDomain}/api/auth/verify/${verificationToken}`,
             );
         });
