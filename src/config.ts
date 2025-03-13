@@ -101,8 +101,6 @@ function loadConfig(nodeEnv?: string): Config {
         },
     };
 
-    console.log(`Config loaded: \n`, JSON.stringify(cachedConfig, null, 2));
-
     return cachedConfig;
 }
 
