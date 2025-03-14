@@ -18,6 +18,7 @@ interface Config {
     isDevelopment: boolean;
     isStaging: boolean;
     port: number;
+    apiDomain: string;
     db: {
         name: string;
         username: string;
@@ -30,6 +31,13 @@ interface Config {
     jwt: {
         secret: string;
         expiresIn: string;
+    };
+    smtp: {
+        email: string;
+        password: string;
+        host: string;
+        port: number;
+        secure: boolean;
     };
 }
 
@@ -67,6 +75,7 @@ function loadConfig(nodeEnv?: string): Config {
         isStaging: localNodeEnv === 'staging',
 
         port: parseInt(process.env.PORT || '3000'),
+        apiDomain: process.env.API_DOMAIN ?? 'http://localhost:3000',
 
         db: {
             name: process.env.DB_NAME as string,
@@ -81,6 +90,14 @@ function loadConfig(nodeEnv?: string): Config {
         jwt: {
             secret: process.env.JWT_SECRET as string,
             expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+        },
+
+        smtp: {
+            email: process.env.SMTP_EMAIL as string,
+            password: process.env.SMTP_PASSWORD as string,
+            host: process.env.SMTP_HOST as string,
+            port: parseInt(process.env.SMTP_PORT || '587'),
+            secure: process.env.SMTP_SECURE === 'true',
         },
     };
 

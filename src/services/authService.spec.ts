@@ -40,6 +40,8 @@ describe('authServices.signIn', () => {
         avatarURL: 'avatar-url',
         subscription: Subscription.STARTER,
         token: null,
+        verify: true,
+        verificationToken: null,
         toJSON: function () {
             return {
                 id: this.id,
@@ -48,6 +50,8 @@ describe('authServices.signIn', () => {
                 avatarURL: this.avatarURL,
                 subscription: this.subscription,
                 token: this.token,
+                verify: this.verify,
+                verificationToken: this.verificationToken,
             };
         },
         update: vi.fn().mockImplementation(function (this: MockUserModel, data) {
@@ -81,6 +85,7 @@ describe('authServices.signIn', () => {
                 email: 'test@example.com',
                 avatarURL: 'avatar-url',
                 subscription: Subscription.STARTER,
+                verify: true,
             },
             token: 'new-token',
         });

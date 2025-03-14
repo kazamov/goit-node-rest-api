@@ -1,4 +1,11 @@
 name: Gating Checks
+description: |
+    This workflow runs on pull requests to the main branch and performs various checks including type checking, linting, building, and running tests. It also sets up a PostgreSQL database and MailHog for email testing.
+    It uploads test results as artifacts for review.
+
+permissions:
+    contents: read
+    pull-requests: write
 
 on:
     pull_request:
@@ -8,7 +15,6 @@ jobs:
     build-and-test:
         runs-on: ubuntu-latest
         timeout-minutes: 15
-        environment: testing
         env:
             NODE_ENV: test
 
@@ -26,6 +32,11 @@ jobs:
                     --health-interval 10s
                     --health-timeout 5s
                     --health-retries 5
+            mailhog:
+                image: mailhog/mailhog
+                ports:
+                    - 1025:1025 # SMTP server
+                    - 8025:8025 # Web UI for debugging (optional)
 
         steps:
             - name: Checkout code
@@ -35,15 +46,6 @@ jobs:
               uses: actions/setup-node@v4
               with:
                   node-version: '22.14.0'
-                  cache: 'npm'
-
-            - name: Cache node modules
-              uses: actions/cache@v4
-              with:
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-node-
 
             - name: Install dependencies
               run: npm ci
@@ -60,7 +62,7 @@ jobs:
             - name: Build
               run: npm run build
 
-            - name: Test
+            - name: Tests
               run: npm run test
 
             - name: E2E Tests
@@ -76,6 +78,12 @@ jobs:
                   JWT_SECRET: ${{ secrets.JWT_SECRET }}
                   JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
                   PORT: ${{ secrets.PORT }}
+                  API_DOMAIN: ${{ secrets.API_DOMAIN }}
+                  SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+                  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+                  SMTP_HOST: ${{ secrets.SMTP_HOST }}
+                  SMTP_PORT: ${{ secrets.SMTP_PORT }}
+                  SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
 
             - name: Upload test results
               if: always()
@@ -84,5 +92,4 @@ jobs:
                   name: test-results-${{ github.run_id }}
                   path: |
                       playwright-report/
-                      coverage/
                   retention-days: 14

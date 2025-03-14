@@ -36,6 +36,16 @@ User.init(
             type: DataTypes.STRING,
             defaultValue: null,
         },
+        verify: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+        },
+        verificationToken: {
+            type: DataTypes.STRING,
+            defaultValue: null,
+        },
     },
     { sequelize },
 );
+
+// await User.sync({ force: true });
