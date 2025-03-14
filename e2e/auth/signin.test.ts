@@ -1,7 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 
-import { createUser, deleteUser } from './utils.js';
+import { createUser, deleteUser } from '../utils.js';
 
 import { Subscription } from '@/constants/auth.js';
 

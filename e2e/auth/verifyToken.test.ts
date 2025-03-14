@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 import { v4 as uuidv4 } from 'uuid';
 
-import { createUser, deleteUser } from './utils.js';
+import { createUser, deleteUser } from '../utils.js';
 
 import { Subscription } from '@/constants/auth.js';
 import { User } from '@/db/models/User.js';

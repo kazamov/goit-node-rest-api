@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
 import mailhog from 'mailhog';
 
-import { createUser, deleteUser } from './utils.js';
+import { createUser, deleteUser } from '../utils.js';
 
 import { getConfig } from '@/config.js';
 import { Subscription } from '@/constants/auth.js';
