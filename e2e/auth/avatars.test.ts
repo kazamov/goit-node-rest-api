@@ -10,6 +10,8 @@ import { createUser, deleteUser } from '../utils.js';
 import { Subscription } from '@/constants/auth.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const rootDir = path.resolve(__dirname, '..', '..');
+const avatarsDir = path.resolve(rootDir, 'public', 'avatars');
 
 test.describe('Avatars endpoint', () => {
     const USER_EMAIL = faker.internet.email();
@@ -42,6 +44,19 @@ test.describe('Avatars endpoint', () => {
 
     test.afterAll(async () => {
         await deleteUser(USER_EMAIL);
+
+        // Clean up the avatars directory
+        const files = fs.readdirSync(avatarsDir);
+        for (const file of files) {
+            const filePath = path.join(avatarsDir, file);
+
+            // skip the .gitkeep file
+            if (file === '.gitkeep') {
+                continue;
+            }
+
+            fs.unlinkSync(filePath);
+        }
     });
 
     test('uploads a new avatar successfully', async ({ request }) => {
@@ -71,6 +86,11 @@ test.describe('Avatars endpoint', () => {
             }),
         );
         expect(jsonBody.avatarURL).not.toEqual(AVATAR_URL);
+
+        // Check if the file exists in the avatars directory
+        const files = fs.readdirSync(avatarsDir);
+        const fileExists = files.some((file) => jsonBody.avatarURL.endsWith(file));
+        expect(fileExists).toBeTruthy();
     });
 
     test('fails without authentication', async ({ request }) => {
