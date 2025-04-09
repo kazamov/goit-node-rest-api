@@ -15,6 +15,12 @@ services:
             interval: 5s
             timeout: 5s
             retries: 5
+    mailhog:
+        image: mailhog/mailhog
+        container_name: mailhog
+        ports:
+            - '${SMTP_PORT}:1025' # SMTP server
+            - '8025:8025' # Web UI to view emails
 
 volumes:
     postgres-test-data:

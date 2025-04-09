@@ -1,9 +1,9 @@
 import { faker } from '@faker-js/faker';
 import { expect, test } from '@playwright/test';
-import bcrypt from 'bcrypt';
+
+import { createUser, deleteUser } from '../utils.js';
 
 import { Subscription } from '@/constants/auth.js';
-import { User } from '@/db/models/User.js';
 
 test.describe('SignIn endpoint', () => {
     const USER_EMAIL = faker.internet.email();
@@ -12,22 +12,18 @@ test.describe('SignIn endpoint', () => {
     const USER_AVATAR_URL = faker.image.avatar();
 
     test.beforeAll(async () => {
-        const passwordHash = await bcrypt.hash(USER_PASSWORD, 10);
-
-        await User.create({
+        await createUser({
             email: USER_EMAIL,
-            password: passwordHash,
+            password: USER_PASSWORD,
             subscription: USER_SUBSCRIPTION,
             avatarURL: USER_AVATAR_URL,
+            verify: true,
+            verificationToken: null,
         });
     });
 
     test.afterAll(async () => {
-        await User.destroy({
-            where: {
-                email: USER_EMAIL,
-            },
-        });
+        await deleteUser(USER_EMAIL);
     });
 
     test.describe('with valid data', () => {
@@ -154,6 +150,50 @@ test.describe('SignIn endpoint', () => {
                     message: 'Email or password is incorrect',
                 }),
             );
+        });
+    });
+
+    test.describe('with unverified email', () => {
+        const USER_EMAIL = faker.internet.email();
+        const USER_PASSWORD = faker.internet.password();
+        const USER_SUBSCRIPTION = Subscription.BUSINESS;
+        const USER_AVATAR_URL = faker.image.avatar();
+
+        test.beforeAll(async () => {
+            await createUser({
+                email: USER_EMAIL,
+                password: USER_PASSWORD,
+                subscription: USER_SUBSCRIPTION,
+                avatarURL: USER_AVATAR_URL,
+                verify: false,
+                verificationToken: null,
+            });
+        });
+
+        test.afterAll(async () => {
+            await deleteUser(USER_EMAIL);
+        });
+
+        test('cannot sign in with unverified email', async ({ request }) => {
+            const response = await request.post(`/api/auth/login`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                data: {
+                    email: USER_EMAIL,
+                    password: USER_PASSWORD,
+                },
+            });
+
+            expect(response.ok()).toBeFalsy();
+            expect(response.status()).toBe(401);
+            expect(response.statusText()).toBe('Unauthorized');
+
+            const jsonBody = await response.json();
+
+            expect(jsonBody).toEqual({
+                message: 'Email not verified',
+            });
         });
     });
 });

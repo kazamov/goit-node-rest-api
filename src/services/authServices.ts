@@ -1,10 +1,12 @@
 import bcrypt from 'bcrypt';
 import gravatar from 'gravatar';
+import { v4 as uuidv4 } from 'uuid';
 
 import { Subscription } from '@/constants/auth.js';
 import { User } from '@/db/models/User.js';
 import HttpError from '@/helpers/HttpError.js';
 import { createToken } from '@/helpers/jwt.js';
+import { sendVerificationEmail } from '@/helpers/sendEmail.js';
 import {
     jwtUserSchema,
     PublicUserAttributes,
@@ -44,17 +46,22 @@ export async function signUp(
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    let newUser = await User.create(
-        { email, password: passwordHash, avatarURL, subscription: Subscription.STARTER },
+    const verificationToken = uuidv4();
+
+    const newUser = await User.create(
+        {
+            email,
+            password: passwordHash,
+            avatarURL,
+            subscription: Subscription.STARTER,
+            verificationToken,
+        },
         { returning: true },
     );
 
-    const userPayload = jwtUserSchema.parse(newUser.toJSON());
-    const token = createToken(userPayload);
+    await sendVerificationEmail(email, verificationToken);
 
-    newUser = await newUser.update({ token }, { returning: true });
-
-    return { user: publicUserSchema.parse(newUser.toJSON()), token };
+    return { user: publicUserSchema.parse(newUser.toJSON()), token: null };
 }
 
 export async function signIn(email: string, password: string): Promise<SignInResponse> {
@@ -64,6 +71,10 @@ export async function signIn(email: string, password: string): Promise<SignInRes
 
     if (!user) {
         throw new HttpError('Email or password is incorrect', 401);
+    }
+
+    if (!(user as unknown as UserAttributes).verify) {
+        throw new HttpError('Email not verified', 401);
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -119,4 +130,39 @@ export async function updateAvatar(id: string, avatarURL: string): Promise<Publi
     await user.update({ avatarURL }, { returning: true });
 
     return publicUserSchema.parse(user.toJSON());
+}
+
+export async function verifyEmail(verificationToken: string): Promise<void> {
+    const user = await User.findOne({
+        where: { verificationToken },
+    });
+
+    if (!user) {
+        throw new HttpError('User not found', 404);
+    }
+
+    if ((user as unknown as UserAttributes).verify) {
+        throw new HttpError('Verification has already been passed', 400);
+    }
+
+    await user.update({ verify: true, verificationToken: null }, { returning: true });
+}
+
+export async function resendVerifyEmail(email: string): Promise<void> {
+    const user = await User.findOne({
+        where: { email },
+    });
+
+    if (!user) {
+        throw new HttpError('User not found', 404);
+    }
+
+    if ((user as unknown as UserAttributes).verify) {
+        throw new HttpError('Verification has already been passed', 400);
+    }
+
+    const verificationToken = uuidv4();
+    await user.update({ verificationToken }, { returning: true });
+
+    await sendVerificationEmail(email, verificationToken);
 }
